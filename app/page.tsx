@@ -58,14 +58,12 @@ export default function Home() {
         <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">{error}</div>
       )}
 
-      {loading ? (
-        <p className="text-gray-500">Loading GIFs...</p>
+{loading && gifs.length === 0 ? (
+        <GifGrid gifs={[]} onSelect={setSelectedGif} loading={true} />
       ) : gifs.length === 0 ? (
-        !error && gifs.length === 0 && (
-          <p className="text-gray-500">No GIFs found. Try another search</p>
-        )
+        <p className="text-gray-500">No GIFs found. Try another search</p>
       ) : (
-        <GifGrid gifs={gifs} onSelect={setSelectedGif} />
+        <GifGrid gifs={gifs} onSelect={setSelectedGif} loading={false} />
       )}
 
       {selectedGif && (
