@@ -1,18 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Gif } from "@/types/gif";
 import SearchBar from "./components/Searchbar";
 import GifGrid from "./components/GifGrid";
 import GifModal from "./components/GifModal";
-import { searchGifs } from "@/utils/giphy";
+import { searchGifs, getTrendingGifs } from "@/utils/giphy";
 
 export default function Home() {
   const [gifs, setGifs] = useState<Gif[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
+
+  useEffect(() => {
+    const loadTrendingGifs = async () => {
+      try {
+        const trendingGifs = await getTrendingGifs();
+        setGifs(trendingGifs);
+      } catch (err) {
+        setError("Failed to load trending GIFs. Please try again later.");
+        console.error("Error loading trending GIFs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTrendingGifs();
+  }, []);
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) return;
@@ -45,9 +61,9 @@ export default function Home() {
       {loading ? (
         <p className="text-gray-500">Loading GIFs...</p>
       ) : gifs.length === 0 ? (
-        <p className="text-gray-500">
-          {error ? "Try another search" : "Search for GIFs to get started"}
-        </p>
+        !error && gifs.length === 0 && (
+          <p className="text-gray-500">No GIFs found. Try another search</p>
+        )
       ) : (
         <GifGrid gifs={gifs} onSelect={setSelectedGif} />
       )}
