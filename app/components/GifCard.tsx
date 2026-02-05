@@ -13,6 +13,9 @@ export default function GifCard({ gif, onClick }: Props) {
         src={gif.images.fixed_height.url ?? ""}
         alt={gif.title}
         className="rounded w-full"
+        width={Number(gif.images.fixed_height.width) || 300}
+        height={Number(gif.images.fixed_height.height) || 200}
+        unoptimized={true}
       />
       <p className="text-sm mt-1 truncate">{gif.title || "Untitled GIF"}</p>
     </div>
