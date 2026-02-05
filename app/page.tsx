@@ -6,15 +6,16 @@ import { Gif } from "@/types/gif";
 import SearchBar from "./components/Searchbar";
 import GifGrid from "./components/GifGrid";
 import GifModal from "./components/GifModal";
-import { searchGifs, getTrendingGifs} from "@/utils/giphy";
+import { searchGifs, getTrendingGifs } from "@/utils/giphy";
 import NoResults from "./components/NoResults";
+import ErrorMessage from "./components/ErrorMessage";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 export default function Home() {
   const [gifs, setGifs] = useState<Gif[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{message: string; retry?: () => void} | null>(null);
   const [selectedGif, setSelectedGif] = useState<Gif | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState({ offset: 0, hasMore: true });
@@ -33,8 +34,20 @@ export default function Home() {
         offset: offset + data.length,
         hasMore: newPagination.offset + newPagination.count < newPagination.total_count
       });
+      setError(null); 
     } catch (err) {
-      setError("Failed to load GIFs. Please try again.");
+      const errorMessage = searchQuery 
+        ? `Failed to load search results for "${searchQuery}".`
+        : 'Failed to load trending GIFs.';
+      
+      setError({
+        message: errorMessage,
+        retry: () => {
+          setLoading(true);
+          loadGifs(isNewSearch);
+        }
+      });
+      
       console.error("Error loading GIFs:", err);
     } finally {
       setLoading(false);
@@ -42,7 +55,6 @@ export default function Home() {
     }
   }, [searchQuery, pagination.offset]);
 
-  // Load more GIFs when user scrolls to bottom
   const { loadMoreRef } = useInfiniteScroll(async () => {
     if (!loading && !loadingMore && pagination.hasMore) {
       setLoadingMore(true);
@@ -50,7 +62,6 @@ export default function Home() {
     }
   });
 
-  // Initial load and search handler
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setLoading(true);
@@ -58,7 +69,6 @@ export default function Home() {
     setPagination({ offset: 0, hasMore: true });
   };
 
-  // Load initial or search results
   useEffect(() => {
     loadGifs(true);
   }, [searchQuery]);
@@ -71,14 +81,26 @@ export default function Home() {
 
       <div className="pt-16">
         {error && (
-          <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">
-            {error}
+          <div className="mb-4">
+            <ErrorMessage 
+              message={error.message} 
+              onDismiss={() => setError(null)}
+              className={error.retry ? 'mb-2' : ''}
+            />
+            {error.retry && (
+              <button
+                onClick={error.retry}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Try Again
+              </button>
+            )}
           </div>
         )}
 
         {loading && gifs.length === 0 ? (
           <GifGrid gifs={[]} onSelect={setSelectedGif} loading={true} />
-        ) : gifs.length === 0 ? (
+        ) : gifs.length === 0 && !error ? (
           <NoResults />
         ) : (
           <>
