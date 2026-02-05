@@ -7,6 +7,7 @@ import SearchBar from "./components/Searchbar";
 import GifGrid from "./components/GifGrid";
 import GifModal from "./components/GifModal";
 import { searchGifs, getTrendingGifs } from "@/utils/giphy";
+import NoResults from "./components/NoResults";
 
 export default function Home() {
   const [gifs, setGifs] = useState<Gif[]>([]);
@@ -64,7 +65,7 @@ export default function Home() {
         {loading && gifs.length === 0 ? (
           <GifGrid gifs={[]} onSelect={setSelectedGif} loading={true} />
         ) : gifs.length === 0 ? (
-          <p className="text-gray-500">No GIFs found. Try another search</p>
+          <NoResults />
         ) : (
           <GifGrid gifs={gifs} onSelect={setSelectedGif} loading={false} />
         )}
