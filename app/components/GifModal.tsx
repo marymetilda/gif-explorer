@@ -10,7 +10,7 @@ export default function GifModal({ gif, onClose }: Props) {
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
       <div className="bg-white p-4 rounded max-w-lg w-full relative">
-        <button onClick={onClose} className="absolute top-2 right-2 text-xl">
+        <button onClick={onClose} className="absolute top-2 right-2 text-xl px-2 py-1 bg-gray-600 rounded-full">
           ✕
         </button>
         <Image

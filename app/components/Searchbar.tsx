@@ -20,7 +20,7 @@ export default function SearchBar({ onSearch }: SearchbarProps) {
         placeholder="Search GIFs..."
         className="border p-2 flex-1 rounded"
       />
-      <button className="bg-black text-white px-4 rounded">Search</button>
+      <button className="bg-black dark:bg-gray-800 text-white px-4 rounded">Search</button>
     </form>
   );
 }

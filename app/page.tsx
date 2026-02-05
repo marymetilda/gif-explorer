@@ -54,17 +54,21 @@ export default function Home() {
 
       <SearchBar onSearch={handleSearch} />
 
-      {error && (
-        <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">{error}</div>
-      )}
+      <div className="pt-16">
+        {error && (
+          <div className="p-4 mb-4 text-red-700 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
 
-{loading && gifs.length === 0 ? (
-        <GifGrid gifs={[]} onSelect={setSelectedGif} loading={true} />
-      ) : gifs.length === 0 ? (
-        <p className="text-gray-500">No GIFs found. Try another search</p>
-      ) : (
-        <GifGrid gifs={gifs} onSelect={setSelectedGif} loading={false} />
-      )}
+        {loading && gifs.length === 0 ? (
+          <GifGrid gifs={[]} onSelect={setSelectedGif} loading={true} />
+        ) : gifs.length === 0 ? (
+          <p className="text-gray-500">No GIFs found. Try another search</p>
+        ) : (
+          <GifGrid gifs={gifs} onSelect={setSelectedGif} loading={false} />
+        )}
+      </div>
 
       {selectedGif && (
         <GifModal gif={selectedGif} onClose={() => setSelectedGif(null)} />
